@@ -46,6 +46,12 @@ jobs:
       - name: Validate depends
         run: composer depends --tree --version --no-cache
 
+      - name: remove no updated files
+        run: |
+          rm -rf vendor/
+          rm -rf .git/
+          rm -rf .github/
+
       - name: FTP to aliyun vh
         uses: SamKirkland/FTP-Deploy-Action@4.1.0
         with:
@@ -54,11 +60,6 @@ jobs:
           password: ${{ secrets.ALIYUN_VH_PASSWORD }}
           local-dir: ./
           server-dir: htdocs/booster/
-          exclude: |
-            **/.git*
-            **/.git*/**
-            **/node_modules/**
-            **/vendor/**
 
 
         # Add a test script to composer.json, for instance: "test": "vendor/bin/phpunit"
