@@ -16,11 +16,11 @@ on:
 jobs:
 
   build-and-deploy:
-    # The type of runner that the job will run on: ubuntu-latest or macos-11
-    runs-on: macos-11
+    # The type of runner that the job will run on: ubuntu-latest
+    runs-on: ubuntu-latest
 
     env:
-      COMPOSER_VERSION: 1
+      COMPOSER_VERSION: 2.1
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
@@ -29,20 +29,19 @@ jobs:
       # with:
       #   persist-credentials: false
 
+      - name: composer-php
+        # You may pin to the exact commit or the version. only support on Linux
+        # uses: nick-zh/composer@e4150fc9fc675948c55d3ef85282328bdd40a60e
+        uses: nick-zh/composer@php7.3
+        with:
+          # Action to run, e.g. install, add any additional options you need also here
+           action: install --prefer-dist --no-progress # optional, default is install
+
       - name: Validate composer.json and composer.lock
-        run: composer validate --strict
-
-#      - name: Cache Composer packages
-#        id: composer-cache
-#        uses: actions/cache@v2
-#        with:
-#          path: vendor
-#          key: ${{ runner.os }}-php-${{ hashFiles('**/composer.lock') }}
-#          restore-keys: |
-#            ${{ runner.os }}-php-
-
-      - name: Install dependencies
-        run: composer install --prefer-dist --no-progress
+        run: |
+          php -v
+          composer --version
+          composer validate --strict
 
       - name: Validate depends
         run: composer depends --tree --version --no-cache
@@ -55,8 +54,12 @@ jobs:
           password: ${{ secrets.ALIYUN_VH_PASSWORD }}
           local-dir: ./
           server-dir: htdocs/booster/
-          dangerous-clean-slate: true
-          dry-run: true # for testing
+          exclude: |
+            **/.git*
+            **/.git*/**
+            **/node_modules/**
+            **/vendor/**
+
 
         # Add a test script to composer.json, for instance: "test": "vendor/bin/phpunit"
         # Docs: https://getcomposer.org/doc/articles/scripts.md
